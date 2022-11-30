@@ -5,5 +5,6 @@ export default interface IArticle {
   post_image: string,
   post_thumbnail: string,
   slug: string,
-  title: string
+  title: string,
+  deleted: boolean,
 }

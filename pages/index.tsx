@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useQuery } from 'react-query';
 import getIndexData from '../queries/getIndexData';
-import Card from "../components/Card";
-import CardImage from "../components/CardImage";
-import CardContent from "../components/CardContent";
+import Card from "../components/Card/Card";
+import CardImage from "../components/Card/CardImage";
+import CardContent from "../components/Card/CardContent";
 import Navigation from "../components/Navigation";
 import { useRouter } from "next/router";
-import useDebounce from "../util/useDebounce";
 import IAppData from "../interfaces/IAppData";
-import styled from "@emotion/styled";
+import CardCloseButton from "../components/Card/CardCloseButton";
 
 export default function Home() {
+  const [deletedArticles, setDeletedArticles] = useState<number[]>([]);
   const router = useRouter();
   const { query, filter } = router.query;
   const page = useQuery<IAppData>({
@@ -18,14 +18,16 @@ export default function Home() {
     queryFn: () => getIndexData(query, filter)
   });
   
-    console.log("query");
-    console.log(query);
-    console.log("filter");
-    console.log(filter);
-    console.log("articles");
-    console.log(page);
-  
+  useEffect(() => {
+    router.events.on('routeChangeComplete', (url) => {
+      setDeletedArticles([]);
+    });
+  }, []);
+
   if (page.isLoading) {
+    if (deletedArticles.length > 0) {
+      setDeletedArticles([]);
+    }
     return <span>Loading...</span>
   }
  
@@ -38,21 +40,19 @@ export default function Home() {
   }
   
   if (page.isSuccess) {
-    
     return (
       <>
         {page.data.categories &&
           <Navigation
           ids={page.data.categories}
-          totalArticles={page.data.articles.length}
+          totalArticles={page.data.articles.filter((x,i)=> !deletedArticles.includes(i)).length}
           />}
-        
-        
-
         <div>
           {page.data.articles.map((article, index) => {
+            if (deletedArticles.includes(index)) { return };
             return (
               <Card key={index}>
+                <CardCloseButton onClick={() => setDeletedArticles([...deletedArticles, index])}>X</CardCloseButton>
                 <CardImage name={article.post_image} />
                 <CardContent content={article} />
               </Card>

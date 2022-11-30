@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import Link from 'next/link';
 import { FC } from 'react';
-import IArticle from '../interfaces/IArticle';
+import IArticle from '../../interfaces/IArticle';
 
 type CardContentProps = {
   content: IArticle;
