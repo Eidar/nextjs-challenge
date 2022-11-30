@@ -80,7 +80,7 @@ const Navigation: FC<NavProps> = ({ ids = undefined, totalArticles = 0 }) => {
                   }}
                   className={item.active ? "active" : ""}
                 >
-                  { totalArticles < 100 && item.id == 0 ? "Refetch" : Categories[item.id] }
+                  { (totalArticles < 100 && item.id == 0 && item.active) ? "Refetch" : Categories[item.id] }
                 </NavItem>
               </li>
             )
