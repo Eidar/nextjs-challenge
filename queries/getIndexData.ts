@@ -9,16 +9,16 @@ type QueryParam = string | string[] | undefined;
 
 export default function getIndexData(query?: QueryParam, filter?: QueryParam): Promise<IAppData> {
   let apiUrl: string = 'https://www.alpha-orbital.com/last-100-news.json';
-  console.log(query);
-  console.log(filter);
-  return axios.get(apiUrl).then((latest: any) => {
-    let results = latest.data;
 
-    let categories = getCategories(results, filter);
-    results = filterArticles(results, query, filter)
-
-    return { articles: results, categories: categories };
-  });
+  return fetch(apiUrl, { method: "GET" })
+    .then((latest: any) => {
+      return latest.json();
+    }).then((data: any) => {
+      let results = data;
+      let categories = getCategories(results, filter);
+      results = filterArticles(results, query, filter)
+      return { articles: results, categories: categories };
+    });
 }
 
 function getCategories(results: IArticle[], filter: QueryParam): INavItem[] {
@@ -30,7 +30,10 @@ function getCategories(results: IArticle[], filter: QueryParam): INavItem[] {
   ids.sort();
   ids?.forEach((id) => {
     let active: boolean;
-    if (filter) {
+
+    if (Array.isArray(filter)) {
+      active = id == 0 ? true : false;
+    } else if (filter) {
       active = parseInt(filter.toString()) == id ? true : false;
     } else { 
       active = id == 0 ? true : false;
@@ -44,13 +47,14 @@ function getCategories(results: IArticle[], filter: QueryParam): INavItem[] {
 function filterArticles(results: IArticle[], query: QueryParam, filter: QueryParam): IArticle[] { 
   let res: IArticle[] = [];
 
-  if (filter && filter !== "0") { 
-    let id = parseInt(<string>filter);
-    res = results.filter((article: IArticle) => article.post_category_id == id);
-  }
   if (filter == "0" || filter == undefined) {
     res = results;
   }
+  if (filter && filter !== "0") {
+    let id = parseInt(<string>filter);
+    res = results.filter((article: IArticle) => article.post_category_id == id);
+  }
+
   if (query && query.length > 3) {
     res = res.filter((article: IArticle) => article.title.toLowerCase().includes(query.toString().toLowerCase()))
   }

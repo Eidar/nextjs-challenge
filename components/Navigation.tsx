@@ -1,9 +1,10 @@
 import styled from '@emotion/styled';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { ChangeEvent, createRef, FC, useEffect,  useRef,  useState } from 'react';
+import { createRef, FC, useEffect,  useRef,  useState } from 'react';
 import Categories from '../enums/Categories';
 import { INavItem } from '../interfaces/INavItem';
+import CategoryFilter from './CategoryFilter';
 
 type NavProps = {
   ids?: INavItem[];
@@ -13,7 +14,8 @@ type NavProps = {
 const Navigation: FC<NavProps> = ({ ids = undefined, totalArticles = 0 }) => {
   const router = useRouter();
   const { query, filter } = router.query;
-  const [categories, setCategories] = useState < INavItem[] >([{route: "/", id: 0, active: true}]);
+  const [categories, setCategories] = useState<INavItem[]>([{ route: "/", id: 0, active: true }]);
+  
   const value = useRef<string | undefined>(undefined);
   const inputRef = createRef<HTMLInputElement>();
  
@@ -100,7 +102,8 @@ const Navigation: FC<NavProps> = ({ ids = undefined, totalArticles = 0 }) => {
               })
             }>
               SEARCH
-            </button>
+        </button>
+        <CategoryFilter categories={categories} />
       </SearchWrapper>
       <ResultsWrapper>
           <Results>Currently showing {totalArticles} articles</Results>
